@@ -2,6 +2,7 @@
 
 Tests the merge command.
 """
+
 from pathlib import Path
 
 import pytest
@@ -35,8 +36,8 @@ def merge_setup(runner, setup_repo):
     runner.invoke(main, ["commit", "Hello, gitlepy > a.txt"])
 
 
-def test_merge_uncommited_changes(runner, setup_repo):
-    """Fails to merge due to staged but uncommited changes."""
+def test_merge_uncommitted_changes(runner, setup_repo):
+    """Fails to merge due to staged but uncommitted changes."""
     runner.invoke(main, ["checkout", "main"])
     file_a = Path(setup_repo["work_path"] / "a.txt")
     file_a.write_text("Hi\n")
