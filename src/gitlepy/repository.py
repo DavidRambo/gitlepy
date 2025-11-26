@@ -1,6 +1,7 @@
 """Repository module for Gitlepy.
 Handles the logic for managing a Gitlepy repository.
 All commands from gitlepy.main are dispatched to various functions in this module."""
+
 import pickle
 import shutil
 import tempfile
@@ -64,9 +65,9 @@ class Repo:
 
     def branches(self) -> List[str]:
         """Returns a list of branch names."""
-        assert (
-            self.branches_dir.exists()
-        ), "Error: Gitlepy's branches directory does not exist."
+        assert self.branches_dir.exists(), (
+            "Error: Gitlepy's branches directory does not exist."
+        )
         path_list = list(self.branches_dir.glob("*"))
         result = []
         for file in path_list:
@@ -314,8 +315,8 @@ class Repo:
         # Is it unchanged since most recent commit?
         head_commit = self.load_commit(self.head_commit_id())
         if (  # First condition avoids KeyError in blobs dict.
-            not filename not in head_commit.blobs.keys() and
-            new_blob.id == head_commit.blobs[filename]
+            not filename not in head_commit.blobs.keys()
+            and new_blob.id == head_commit.blobs[filename]
         ):
             # Yes -> Do not stage, and remove if already staged.
             if index.is_staged(filename):
@@ -324,8 +325,8 @@ class Repo:
                 print("No changes have been made to that file.")
         # Check whether file is already staged as well as since changed.
         elif (
-            filename in index.additions.keys() and
-            new_blob.id == index.additions[filename]
+            filename in index.additions.keys()
+            and new_blob.id == index.additions[filename]
         ):
             print("File is already staged in present state.")
         else:
@@ -390,7 +391,7 @@ class Repo:
             else:
                 commit = self.load_commit(commit_id)
 
-        # Validate that file exists in HEAD commit.
+        # Validate that file exists in target commit.
         if filename not in commit.blobs:
             print(f"{filename} is not a valid file.")
         else:  # Checkout the file
@@ -579,8 +580,8 @@ class Repo:
         # Check for unstaged modifications files.
         if self.unstaged_modifications():
             print(
-                "There is a file with unstaged changes;" +
-                " delete it, or add and commit it first."
+                "There is a file with unstaged changes;"
+                + " delete it, or add and commit it first."
             )
             return True
 
@@ -792,9 +793,11 @@ class Repo:
         mid_diff = "=======\n"
         end_diff = f">>>>>>> {commit_id}\n"
 
-        with head_file.open() as f1, target_blob.open() as f2, tempfile.NamedTemporaryFile(
-            mode="w+t", delete=False
-        ) as temp:
+        with (
+            head_file.open() as f1,
+            target_blob.open() as f2,
+            tempfile.NamedTemporaryFile(mode="w+t", delete=False) as temp,
+        ):
             seek1 = f1.tell()  # starting positions
             seek2 = f2.tell()
             line1 = f1.readline()  # first lines
@@ -916,6 +919,6 @@ class Repo:
             elif line < all_lines[mid]:
                 return self._binsearch(line, all_lines[:mid])
             elif line > all_lines[mid]:
-                return self._binsearch(line, all_lines[mid + 1:])
+                return self._binsearch(line, all_lines[mid + 1 :])
 
         return False
